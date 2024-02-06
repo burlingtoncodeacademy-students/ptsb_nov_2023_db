@@ -16,6 +16,9 @@ const MONGODB = process.env.MONGO_DB_URL + process.env.DB_NAME;
 //? Assign Express
 const app = express();
 
+//? Import controller/s
+const { userController } = require("./controllers/index");
+
 //? Connection middleware, connecting to DB
 mongoose.connect(MONGODB);
 
@@ -53,6 +56,9 @@ app.use(express.urlencoded({ extended: true }));
 
 //? Allow our endpoints to be interacted with via web browser
 app.use(cors());
+
+//? Using the controllers
+app.use("/user", userController);
 
 //? Initial spin up of the Express server
 app.listen(PORT, () => {
