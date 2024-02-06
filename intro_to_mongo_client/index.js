@@ -54,7 +54,7 @@ app.get("/userdata", async (req, res) => {
     let userColl = await dbConnect();
     let results = [];
 
-    let userList = await userColl.find();
+    let userList = userColl.find();
 
     // await userList.forEach((userObj) => {
     //   results.push(userObj);
