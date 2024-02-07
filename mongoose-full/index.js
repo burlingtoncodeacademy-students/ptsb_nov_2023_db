@@ -19,14 +19,16 @@ const app = express();
 //? Import controller/s
 const { userController } = require("./controllers/index");
 
+// TODO Implement validation middleware
+
 //? Connection middleware, connecting to DB
 mongoose.connect(MONGODB);
 
 //? Storing the connection status
 const db = mongoose.connection;
-// get seed data
-// make model
+// Get seed data
 
+//? Creating a table/collection for our Database
 const ProductModel = mongoose.model(
   "product",
   new mongoose.Schema({
@@ -38,11 +40,16 @@ const ProductModel = mongoose.model(
   })
 );
 
+//? Creating event listener for an opened connection to the database
 db.once("open", async () => {
   console.log("*".repeat(10));
   console.log(`Connected successfully to database:\n${MONGODB}`);
   console.log("*".repeat(10));
+
+  //TODO Seed Data to ProductModel
 });
+
+// TODO Event listener for db connection error
 
 //? Assigning a variable from .env, with fallback port of 8080
 //* || - OR/DEFAULT operator
@@ -71,4 +78,4 @@ app.listen(PORT, () => {
   }
 });
 
-// get request for the model
+//TODO Get request using query params to Product model
