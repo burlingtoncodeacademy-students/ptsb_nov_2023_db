@@ -17,9 +17,10 @@ const MONGODB = process.env.MONGO_DB_URL + process.env.DB_NAME;
 const app = express();
 
 //? Import controller/s
-const { userController } = require("./controllers/index");
+const { userController, postController } = require("./controllers/index");
 
-// TODO Implement validation middleware
+//? Import validation middleware
+const validateSession = require("./middleware/validate-session");
 
 //? Connection middleware, connecting to DB
 mongoose.connect(MONGODB);
@@ -66,6 +67,8 @@ app.use(cors());
 
 //? Using the controllers
 app.use("/user", userController);
+app.use(validateSession);
+app.use("/post", postController);
 
 //? Initial spin up of the Express server
 app.listen(PORT, () => {
