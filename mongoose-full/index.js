@@ -1,6 +1,9 @@
 //? Importing dotenv, and applying it (giving us access to process.env)
 require("dotenv").config();
 
+//? Import seed data
+const seedData = require("./seed_data/products_seed");
+
 //? Importing Express
 const express = require("express");
 
@@ -27,7 +30,6 @@ mongoose.connect(MONGODB);
 
 //? Storing the connection status
 const db = mongoose.connection;
-// Get seed data
 
 //? Creating a table/collection for our Database
 const ProductModel = mongoose.model(
@@ -47,10 +49,18 @@ db.once("open", async () => {
   console.log(`Connected successfully to database:\n${MONGODB}`);
   console.log("*".repeat(10));
 
-  //TODO Seed Data to ProductModel
+  let foundProducts = await ProductModel.find();
+
+  if (foundProducts.length === 0) {
+    console.log("*".repeat(10));
+    console.log("Seeding the products collection with data");
+    console.log("*".repeat(10));
+
+    await ProductModel.insertMany(seedData);
+  }
 });
 
-// TODO Event listener for db connection error
+db.on("error", (err) => console.log(`Error ${err}`));
 
 //? Assigning a variable from .env, with fallback port of 8080
 //* || - OR/DEFAULT operator
@@ -81,4 +91,26 @@ app.listen(PORT, () => {
   }
 });
 
-//TODO Get request using query params to Product model
+//? Get request using query params to Product model
+app.get("/product", async (req, res) => {
+  try {
+    const { min, max, tags } = req.query;
+    let all = await ProductModel.find()
+      .where("price")
+      .gt(min)
+      .lt(max)
+      .where("tags")
+      .in(tags.split(","))
+      .limit(10)
+      .sort({ price: -1 })
+      .select("name emoji price quantity tags");
+
+    res.status(200).json({
+      Results: all,
+    });
+  } catch (err) {
+    res.status(500).json({
+      Error: err,
+    });
+  }
+});
