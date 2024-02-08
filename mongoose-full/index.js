@@ -49,17 +49,20 @@ db.once("open", async () => {
   console.log(`Connected successfully to database:\n${MONGODB}`);
   console.log("*".repeat(10));
 
+  //? Finding all products
   let foundProducts = await ProductModel.find();
 
+  //? Check if table has already been seeded, if not, seed it.
   if (foundProducts.length === 0) {
     console.log("*".repeat(10));
     console.log("Seeding the products collection with data");
     console.log("*".repeat(10));
-
+    //? Seeding data
     await ProductModel.insertMany(seedData);
   }
 });
 
+//? Event listener for an error event that can occur on the database connection
 db.on("error", (err) => console.log(`Error ${err}`));
 
 //? Assigning a variable from .env, with fallback port of 8080
@@ -77,6 +80,7 @@ app.use(cors());
 
 //? Using the controllers
 app.use("/user", userController);
+//? Implementing validation middleware here. Any routes/controllers below will have this middleware applied.
 app.use(validateSession);
 app.use("/post", postController);
 
@@ -94,7 +98,10 @@ app.listen(PORT, () => {
 //? Get request using query params to Product model
 app.get("/product", async (req, res) => {
   try {
+    //? Grabbing query parameters
     const { min, max, tags } = req.query;
+
+    //? Creating a complex query
     let all = await ProductModel.find()
       .where("price")
       .gt(min)
@@ -104,6 +111,14 @@ app.get("/product", async (req, res) => {
       .limit(10)
       .sort({ price: -1 })
       .select("name emoji price quantity tags");
+
+    // let all = await ProductModel.find({
+    //   quantity: { $gt: 5, $lt: 66 },
+    //   tags: { $in: ["electronics"] },
+    // })
+    //   .limit(10)
+    //   .sort({ price: -1 })
+    //   .select("name emoji price quantity tags");
 
     res.status(200).json({
       Results: all,

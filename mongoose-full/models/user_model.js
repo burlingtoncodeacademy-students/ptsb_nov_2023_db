@@ -1,6 +1,7 @@
 //? Import from the mongoose library
 const mongoose = require("mongoose");
 
+//? Assigning the schema to a variable just to separate things out
 const UserSchema = new mongoose.Schema({
   firstName: {
     type: String,

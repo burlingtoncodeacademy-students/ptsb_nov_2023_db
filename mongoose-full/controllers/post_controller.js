@@ -59,6 +59,46 @@ router.post("/create", async (req, res) => {
   }
 });
 
+router.patch("/update/:id", async (req, res) => {
+  try {
+    let newInfo = req.body;
+
+    let result = await Post.findByIdAndUpdate(req.params.id, newInfo, {
+      new: true,
+    });
+    //
+    res.status(200).json({
+      Updated: result,
+    });
+  } catch (err) {
+    res.status(500).json({
+      Error: err,
+    });
+  }
+});
+
+router.delete("/delete/:id", async (req, res) => {
+  try {
+    const post = await Post.findByIdAndDelete(req.params.id);
+    const allResults = await Post.find().populate("user_id", [
+      "firstName",
+      "lastName",
+      "-_id",
+    ]);
+
+    if (!post) throw new Error("Post not found");
+
+    res.status(200).json({
+      Deleted: post,
+      Results: allResults,
+    });
+  } catch (err) {
+    res.status(500).json({
+      Error: err.message,
+    });
+  }
+});
+
 router.get("/all", async (req, res) => {
   try {
     let results = await Post.find()
